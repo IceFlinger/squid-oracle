@@ -120,7 +120,7 @@ def mapmode_analyze():
 			if (battle["rule"]["key"] in mode_filter) and (battle["map"]["key"] in map_filter):
 				filtered_battles.append(battle)
 	weapons = {}
-	#need to find a way to make this easier to rearrange
+	#need to find a way to make this easier to rearrange (make it a dict you retard)
 	legend = ["Weapon", "Wins", "Losses", "Win/Loss %", "Kills", "Assists", "Deaths", "Specials", "Special ratio", "Kill/Death ratio", "Kill+Assist/Death ratio",  "Kill rate average"]
 	for battle in filtered_battles:
 		cur_weapon = battle["weapon"]["key"]
@@ -129,7 +129,7 @@ def mapmode_analyze():
 			cur_weapon = battle["weapon"]["reskin_of"]
 		if cur_weapon not in weapons:
 			weapons[cur_weapon] = [battle["weapon"]["name"]["en_US"],0,0,0,0,0,0,0,0,0,0,0]
-		#total stats:
+		#totaled stats:
 		if battle["result"] == "win":
 			weapons[cur_weapon][1] += 1 #wins
 		else:
