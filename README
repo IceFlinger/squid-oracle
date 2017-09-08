@@ -1,0 +1,17 @@
+squid oracle 
+stat.ink analysis tool
+
+a poor attempt to recreate some of the older features the site had before move to splatoon 2
+other future goals:
+select team based on roster, stats, and map for a given match
+weapon suggestions for certain rotations
+
+how to use:
+Battle data can be loaded from the menu or while starting program with flags:
+-u [User]: Scrape battle data from [User]'s page on stat.ink
+-f [File]: Fetch json battle data from given file
+Using both will fetch data from the stat.ink user and immediately store it into the file
+
+Working so far:
+Filter all battles to specific map/modes and calculate winrates and kdr
+Weapons with less than 10 battles show a negative winrate to sort them to the bottom of the list.
