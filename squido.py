@@ -121,7 +121,8 @@ def mapmode_analyze():
 				filtered_battles.append(battle)
 	weapons = {}
 	#legend can be rearranged to reorganize final table
-	legend = ["Weapon", "WLR", "KDR", "ADR", "SR",  "KRA", "Wins", "Losses", "Kills", "Assists", "Deaths", "Specials"]
+	legend = ["Weapon", "WLR", "KDR", "ADR", "SR", "TR", "AGL", "Wins", "Losses", "Kills", "Assists", "Deaths", "Specials", "Turf", "Game Time"]
+	internal = ["TG"]
 	for battle in filtered_battles:
 		cur_weapon = battle["weapon"]["key"]
 		if battle["weapon"]["reskin_of"] is not None:
@@ -130,9 +131,12 @@ def mapmode_analyze():
 		if cur_weapon not in weapons:
 			weapons[cur_weapon] = {}
 			weapons[cur_weapon]["Weapon"] = battle["weapon"]["name"]["en_US"]
+			weapons[cur_weapon]["tg"] = 0 #internal counter for games with turf data
 			for stat in legend:
 				if stat != "Weapon":
 					weapons[cur_weapon][stat] = 0
+			for stat in internal:
+				weapons[cur_weapon][stat] = 0
 			#weapons[cur_weapon] = [battle["weapon"]["name"]["en_US"],0,0,0,0,0,0,0,0,0,0,0]
 		#totaled stats:
 		if battle["result"] == "win":
@@ -143,16 +147,26 @@ def mapmode_analyze():
 		weapons[cur_weapon]["Assists"] += (battle["kill_or_assist"] - battle["kill"]) #assists
 		weapons[cur_weapon]["Deaths"] += battle["death"] #deaths
 		weapons[cur_weapon]["Specials"] += battle["special"] #specials
-		#turf logic? need to account for games missing data/games with shorter duration
-		if battle["kill_rate"] is not None:
-			#idk what the fuck this stat even means but stat.ink has it (percentage based kdr?)
-			weapons[cur_weapon]["KRA"] += battle["kill_rate"]
+		game_time = battle["end_at"]["time"] - battle["start_at"]["time"]
+		weapons[cur_weapon]["Game Time"] += game_time
+		if battle["my_point"] is not None:
+			weapons[cur_weapon]["TG"] += 1
+			weapons[cur_weapon]["Turf"] += battle["my_point"]
+			weapons[cur_weapon]["TR"] += battle["my_point"]/(game_time/60)
+		#if battle["kill_rate"] is not None:
+		#	#idk what the fuck this stat even means but stat.ink has it (percentage based kdr?)
+		#	weapons[cur_weapon]["KRA"] += battle["kill_rate"]
 	table = prettytable.PrettyTable(legend)
 	table.float_format = ".2"
 	# calculated stats:
 	for w in weapons:
 		total_games = weapons[w]["Wins"]+weapons[w]["Losses"]
 		weapons[w]["WLR"] = (weapons[w]["Wins"]/total_games) #winrate
+		if weapons[w]["TG"] != 0:
+			weapons[w]["TR"] = weapons[w]["TR"]/weapons[w]["TG"]
+		else:
+			weapons[w]["TR"] = 0
+		weapons[w]["AGL"] = (weapons[w]["Game Time"]/total_games) #average game length
 		if (total_games)<10:
 			#if a weapon has less than 10 battles played, invert the winrate so it sorts to the bottom
 			weapons[w]["WLR"] = 0 - weapons[w]["WLR"]
@@ -163,15 +177,17 @@ def mapmode_analyze():
 		else:
 			weapons[w]["KDR"] = (weapons[w]["Kills"]/weapons[w]["Deaths"]) #kills/deaths
 			weapons[w]["ADR"] = ((weapons[w]["Kills"]+weapons[w]["Assists"])/weapons[w]["Deaths"])# kills+assists/deaths
-		weapons[w]["KRA"] = (weapons[w]["KRA"]/total_games) # average out the kill rate
+		#weapons[w]["KRA"] = (weapons[w]["KRA"]/total_games) # average out the kill rate
 		new_row = []
 		for item in legend:
 			new_row.append(weapons[w][item])
 		table.add_row(new_row)
 	table.reversesort = True
 	table.sortby = "WLR"
+	table.align = "l"
 	print(mode_name + " on " + map_name)
 	print(table)
+	print("WLR = Wins/Losses, KDR = Kills/Deaths, ADR = Assists+Kills/Deaths, SR = Specials/Game, TR = Turf/Minute, AGL = Game Time/Games played")
 
 def weapon_analyze():
 	global database
