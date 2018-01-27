@@ -12,12 +12,13 @@ modes = [
 	{ "Splat Zones": ["area"] },
 	{ "Tower Control": ["yagura"] },
 	{ "Rainmaker": ["hoko"] },
-	{ "Ranked modes": ["area", "yagura", "hoko"] },
+	{ "Clam Blitz": ["asari"]},
+	{ "Ranked modes": ["area", "yagura", "hoko", "asari"] },
 	{ "Turf war": ["fest", "nawabari"] },
-	{ "All": ["area", "yagura", "hoko", "fest", "nawabari"] }
+	{ "All": ["area", "yagura", "hoko", "fest", "nawabari", "asari"] }
 ]
 maps = [
-	{ "All": ["kombu", "ama", "manta", "tachiuo", "fujitsubo", "hokke", "mystery", "gangaze", "chozame", "battera"] },
+	{ "All": ["kombu", "ama", "manta", "tachiuo", "fujitsubo", "hokke", "mystery", "gangaze", "chozame", "battera", "bbass", "devon", "engawa", "hakofugu", "mozuku", "zatou"] },
 	{ "The Reef": ["battera"] },
 	{ "Humpback Pump Track": ["kombu"] },
 	{ "Inkblot Art Academy": ["ama"] },
@@ -27,6 +28,12 @@ maps = [
 	{ "Moray Towers": ["tachiuo"] },
 	{ "Port Mackerel": ["hokke"] },
 	{ "Manta Maria": ["manta"] },
+	{ "Blackbelly Skatepark": ["bbass"] },
+	{ "Shellendorf Institute": ["devon"] },
+	{ "Snapper Canal": ["engawa"] },
+	{ "Walleye Warehouse": ["hakofugu"] },
+	{ "Kelp Dome": ["mozuku"] },
+	{ "MakoMart": ["zatou"] },
 	{ "Shifty Station": ["mystery"] }
 ]
 
@@ -116,7 +123,7 @@ def mapmode_analyze():
 	filtered_battles = []
 	#filter battles based on selection
 	for battle in database:
-		if battle["map"] is not None: #make sure map was actually recognized
+		if (battle["map"] is not None) and (battle["rule"] is not None): #make sure map was actually recognized
 			if (battle["rule"]["key"] in mode_filter) and (battle["map"]["key"] in map_filter):
 				filtered_battles.append(battle)
 	weapons = {}
