@@ -42,8 +42,34 @@ def help():
 	print("./squido.py [Flags]")
 	print("-u [Name]: User to scrape stats from stat.ink")
 	print("-f [File]: JSON file to read match stats from. If used with -u, archives user stats to file.")
+
+def sanitize_db(database):
+	nomap = 0
+	nomode = 0
+	nowep = 0
+	orig_total = len(database)
+	for battle in database:
+		bad = False
+		if battle["map"] is None:
+			nomap += 1
+			bad = True
+		if battle["rule"] is None:
+			nomode += 1
+			bad = True
+		if battle["weapon"] is None:
+			nowep += 1
+			bad = True
+		if bad:
+			database.remove(battle)
+	if (nomap != 0) or (nomode != 0) or (nowep != 0):
+		print("Had " + str(orig_total) + " battles")
+		print("Found " + str(nomap) + " maps missing, " + str(nomode) + " modes missing, and " + str(nowep) + " weapons missing")
+		print("Now have " + str(len(database)) + " battles")
+	return database 
 	
 def menu(items):
+	global database
+	database = sanitize_db(database)
 	while True:
 		for item in items:
 			print("[" + str(items.index(item)+1) + "] " + list(item)[0])
@@ -70,7 +96,11 @@ def retrieve_statink(username):
 			done = True
 		else:
 			counter = datachunk[49]["id"]
-		data = data + datachunk
+		try:
+			data = data + datachunk
+		except:
+			print("Error retrieving data (possible bad username")
+			return []
 	return data
 
 def retrieve_jsonfile(filename):
