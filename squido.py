@@ -48,6 +48,7 @@ def sanitize_db(database):
 	nomode = 0
 	nowep = 0
 	orig_total = len(database)
+	newdb = []
 	for battle in database:
 		bad = False
 		if battle["map"] is None:
@@ -59,13 +60,13 @@ def sanitize_db(database):
 		if battle["weapon"] is None:
 			nowep += 1
 			bad = True
-		if bad:
-			database.remove(battle)
+		if not bad:
+			newdb.append(battle)
 	if (nomap != 0) or (nomode != 0) or (nowep != 0):
 		print("Had " + str(orig_total) + " battles")
 		print("Found " + str(nomap) + " maps missing, " + str(nomode) + " modes missing, and " + str(nowep) + " weapons missing")
-		print("Now have " + str(len(database)) + " battles")
-	return database 
+		print("Now have " + str(len(newdb)) + " battles")
+	return newdb
 	
 def menu(items):
 	global database
@@ -99,7 +100,7 @@ def retrieve_statink(username):
 		try:
 			data = data + datachunk
 		except:
-			print("Error retrieving data (possible bad username")
+			print("Error retrieving data (possible bad username)")
 			return []
 	return data
 
@@ -153,9 +154,8 @@ def mapmode_analyze():
 	filtered_battles = []
 	#filter battles based on selection
 	for battle in database:
-		if (battle["map"] is not None) and (battle["rule"] is not None): #make sure map was actually recognized
-			if (battle["rule"]["key"] in mode_filter) and (battle["map"]["key"] in map_filter):
-				filtered_battles.append(battle)
+		if (battle["rule"]["key"] in mode_filter) and (battle["map"]["key"] in map_filter):
+			filtered_battles.append(battle)
 	weapons = {}
 	#legend can be rearranged to reorganize final table
 	legend = ["Weapon", "WLR", "KDR", "ADR", "SR", "TR", "AGL", "Wins", "Losses", "Kills", "Assists", "Deaths", "Specials", "Turf", "Game Time"]
